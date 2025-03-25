@@ -38,14 +38,17 @@ class Position:
         self.col += col
         return self
 
-    def adjacents (self, diagonals=True) -> list["Position"]:
+    def adjacents (self, diagonals=True) -> typing.Generator["Position", None, None]:
         (r, c), P = self, Position
-        adjacents = [P(r - 1, c), P(r, c - 1), P(r, c + 1), P(r + 1, c)]
-        if diagonals: adjacents.extend([
+        yield from [
+                        P(r - 1, c),
+            P(r, c - 1),            P(r, c + 1),
+                        P(r + 1, c)
+        ]
+        if diagonals: yield from [
             P(r - 1, c - 1), P(r - 1, c + 1),
             P(r + 1, c - 1), P(r + 1, c + 1)
-        ])
-        return adjacents
+        ]
 
 class Grid [T]:
 
