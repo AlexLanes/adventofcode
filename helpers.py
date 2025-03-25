@@ -38,7 +38,7 @@ class Position:
         self.col += col
         return self
 
-    def adjacents (self, diagonals=True) -> typing.Generator["Position", None, None]:
+    def adjacents (self, diagonals: bool) -> typing.Generator["Position", None, None]:
         (r, c), P = self, Position
         yield from [
                         P(r - 1, c),
