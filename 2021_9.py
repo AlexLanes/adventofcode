@@ -1,3 +1,4 @@
+from collections import deque
 from helpers import Grid, Position
 
 class SmokeBasin:
@@ -26,6 +27,32 @@ class SmokeBasin:
             self.grid[position] + 1
             for position in self.low_points()
         )
+
+    def basin_from_low_point (self, low: Position) -> set[Position]:
+        basin: set[Position] = set()
+        dq = deque([(low, self.grid[low])])
+
+        while dq:
+            position, last_val = dq.popleft()
+            if position in basin or not self.grid.in_bounds(position):
+                continue
+
+            val = self.grid[position]
+            if val == 9 or val < last_val: continue
+            basin.add(position)
+
+            for adjacent in position.adjacents(False):
+                if adjacent == position: continue
+                dq.append((adjacent, val))
+
+        return basin
+
+    def multiply_3_largest_basin (self) -> int:
+        basins = [self.basin_from_low_point(low)
+                  for low in self.low_points()]
+        basins.sort(reverse=True, key=len)
+        a, b, c, *_ = basins
+        return len(a) * len(b) * len(c)
 
 example = """2199943210
 3987894921
@@ -134,4 +161,6 @@ puzzle = """98654567923456789212987654210123456789349954321279954567899876621345
 1239895434579890178923988767921098201239976576799986765679989632129999876545986543249987893498765435"""
 
 assert SmokeBasin(example).sum_risk_level_of_low_points() == 15
+assert SmokeBasin(example).multiply_3_largest_basin() == 1134
 print("Part 1:", SmokeBasin(puzzle).sum_risk_level_of_low_points())
+print("Part 2:", SmokeBasin(puzzle).multiply_3_largest_basin())
