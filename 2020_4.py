@@ -73,4 +73,4 @@ assert PassportProcessing(example).part_1() == 2
 print("Part 1:", PassportProcessing(puzzle).part_1())
 
 assert PassportProcessing(example).part_2() == 2
-print("Part 1:", PassportProcessing(puzzle).part_2())
+print("Part 2:", PassportProcessing(puzzle).part_2())
