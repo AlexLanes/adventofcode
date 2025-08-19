@@ -103,3 +103,8 @@ def windows[T] (items: typing.Sequence[T], size=2) -> typing.Generator[tuple[T, 
     while index + size <= len(items):
         yield tuple(items[i] for i in range(index, index + size))
         index += 1
+
+__all__ = [
+    "Grid",
+    "windows",
+]

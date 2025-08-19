@@ -1,0 +1,126 @@
+"""
+find one word: XMAS
+horizontal, vertical, diagonal, written backwards, or even overlapping other words
+"""
+
+example = """
+....XXMAS.
+.SAMXMS...
+...S..A...
+..A.A.MS.X
+XMASAMX.MM
+X.....XA.A
+S.S.S.S.SS
+.A.A.A.A.A
+..M.M.M.MM
+.X.X.XMASX
+"""
+puzzle_input = """"""
+
+type Position = tuple[int, int]
+"""(row, col)"""
+
+class Grid:
+
+    grid: list[list[str]]
+    size: tuple[int, int]
+    XMAS = "XMAS"
+
+    def __init__ (self, s: str) -> None:
+        self.grid = [
+            [*line]
+            for line in map(lambda char: char.strip().upper(),
+                            s.split("\n"))
+            if line
+        ]
+        self.size = (len(self.grid), len(self.grid[0]))
+
+    def __getitem__ (self, position: Position) -> str:
+        row, col = position
+        return self.grid[row][col]
+
+    def valid_position (self, position: Position) -> bool:
+        return all(
+            0 <= p < s
+            for p, s in zip(position, self.size)
+        )
+
+    def count_at (self, position: Position) -> int:
+        row, col = position
+
+        vertical_left = ((row - offset, col) for offset in range(4))
+        vertical_right = ((row + offset, col) for offset in range(4))
+        horizontal_left = ((row, col - offset) for offset in range(4))
+        horizontal_right = ((row, col + offset) for offset in range(4))
+        diagonal_up_left = ((row - offset, col - offset) for offset in range(4))
+        diagonal_up_right = ((row - offset, col + offset) for offset in range(4))
+        diagonal_down_left = ((row + offset, col - offset) for offset in range(4))
+        diagonal_down_right = ((row + offset, col + offset) for offset in range(4))
+
+        return sum(
+            1
+            for positions in (horizontal_left, horizontal_right,
+                              vertical_left, vertical_right,
+                              diagonal_up_left, diagonal_up_right,
+                              diagonal_down_left, diagonal_down_right)
+            if all(
+                self.valid_position(position) and self[position] == expected_char
+                for position, expected_char in zip(positions, self.XMAS)
+            )
+        )
+
+    def count_xmas (self, start_char="X") -> int:
+        counter = 0
+
+        for row in range(0, self.size[0]):
+            for col in range(0, self.size[1]):
+                position = (row, col)
+                if self[position] != start_char: continue
+                counter += self.count_at(position)
+
+        return counter
+
+# assert Grid(example).count_xmas() == 18
+# print("XMAS Counter: ", Grid(puzzle_input).count_xmas())
+
+
+
+# --- Part 2 ---
+
+
+
+example = """
+.M.S......
+..A..MSMS.
+.M.S.MAA..
+..A.ASMSM.
+.M.S.M....
+..........
+S.S.S.S.S.
+.A.A.A.A..
+M.M.M.M.M.
+"""
+
+class GridX (Grid):
+
+    def count_at (self, position: Position) -> int:
+        row, col = position
+        expected_chars = set("MS")
+
+        left_diagonal = ((row - 1, col - 1), (row + 1, col + 1))
+        right_diagonal = ((row - 1, col + 1), (row + 1, col - 1))
+
+        return 1 if self[position] == "A" and all(
+            expected_chars == set(
+                self[position]
+                for position in positions
+                if self.valid_position(position)
+            )
+            for positions in (left_diagonal, right_diagonal)
+        ) else 0
+
+    def count_xmas (self, start_char="A") -> int:
+        return super().count_xmas(start_char)
+
+assert GridX(example).count_xmas() == 9
+print("XMAS Counter: ", GridX(puzzle_input).count_xmas())
