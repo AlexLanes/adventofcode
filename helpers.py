@@ -1,4 +1,31 @@
+# std
 import typing
+from pathlib import Path
+from inspect import stack
+
+class LoadPuzzleInput:
+    """Load puzzle input from file
+    - `python -m 2025.1`
+    - Expects `./2025/1.py` -> `./2025/1.txt`"""
+
+    puzzle: str
+
+    def __init__ (self) -> None:
+        # self.FromText()
+        if getattr(self, "puzzle", None) is not None:
+            return
+
+        caller = stack()[1].filename
+        puzzle = Path(caller).with_suffix(".txt")
+        assert puzzle.exists(), f"Puzzle Input not found on `{puzzle}`"
+        self.puzzle = puzzle.read_text()
+
+    @classmethod
+    def FromText (cls, text: str) -> "typing.Self":
+        o = object.__new__(cls)
+        o.puzzle = text
+        o.__init__()
+        return o
 
 class Position:
 
@@ -107,4 +134,5 @@ def windows[T] (items: typing.Sequence[T], size=2) -> typing.Generator[tuple[T, 
 __all__ = [
     "Grid",
     "windows",
+    "LoadPuzzleInput",
 ]
